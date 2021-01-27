@@ -1,0 +1,30 @@
+q1
+	"Question q1"
+
+	<example>
+	| s join sender split reader join2 split2|
+	s := TauCSystem new.
+	join := s newJoin: 2.
+	split := s newSplit1to: 2.
+	join2 := s newJoin: 2.
+	split2 := s newSplit1to: 2.
+	sender := (s newTask: 'sender')
+		out: #send;
+		state: #main -> #send
+			do: [ :send | 
+			send at: 1 put: 5.
+			'S1 send 5' logCr ].
+	reader := (s newTask: 'reader')
+		in: #read;
+		state: #main -> #(#read 2)
+			do: [ :read | 
+			('Reader received ' , read first printString , ' '
+				, read second printString) logCr ].
+	sender send >> split input.
+	split output >> join input.
+	join output >> split2 input.
+	split2 output >> join2 input.
+	join2 output >> reader read.
+	s fullyConnected.
+	s exploreInRoassal.
+	^ s

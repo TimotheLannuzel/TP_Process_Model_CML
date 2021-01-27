@@ -1,0 +1,28 @@
+q3
+	"Question q3 fifo de taille 5"
+
+	<example>
+	| s  sender reader |
+	s := TauCSystem new.
+	sender := (s newTask: 'sender')
+		out: #send;
+		state: #main -> #(#send 3)
+			do: [ :send | 
+			send 
+				at: 1 put: 1;
+				at: 2 put: 2;
+				at: 3 put: 3.
+				
+			'S1 send 1 2 3' logCr ].
+
+	reader := (s newTask: 'reader')
+		in: #read;
+		state: #main -> #read 
+			do: [ :read | 
+			('Reader received ' , read first printString , ' '
+				) logCr ].
+	
+	sender send >> reader read size: 5.
+	s fullyConnected.
+	s exploreInRoassal.
+	^ s
