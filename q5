@@ -2,7 +2,7 @@ q5
 	"Question q5"
 
 	<example>
-	| s join matrice vecteur reader mult x|
+	| s  matrice vecteur join mult add1 x reader|
 	s := TauCSystem new.
 	join := s newJoin: 2.
 	
@@ -31,48 +31,46 @@ q5
 			"vecteur send 5 2 3' logCr "].
 		
 	mult := (s newTask: 'mult')
-		in: #read ;
-		out: #send;
-		
-		"state: 
-			{ { #main.
-				[ :in :out
-					{  #(#read 2)
-					do: [ :read :send   | 
-						x := read first * read second.
-						('mult received ' 
-						, read first printString, ' '
-						, read second  printString,' res:'
-						, x printString ) logCr .
-					].}
-					send at: 1 put: x. 
-					
-					 } }"  
-					
-		"state:{{ #main .
-			{#(#read 2) 
-				do: [ :read :send   | 
-				x := read first * read second.
-				('mult received ' 
-					, read first printString, ' '
-					, read second  printString,' res:'
-					, x printString ) logCr .
-					send at: 1 put: x.
-				].
-		  		}}}."
-		
-	reader  End of statement list encountered ->:= (s newTask: 'reader')
 		in: #read;
-		state: #main -> #read
+		out: #send;
+		state: #main -> #(#send #read 2)
+			do: [ :send :read | 
+			x := read first * read second.
+			send at: 1 put: x.
+			('mult:  ' , read first printString, ' * '
+			,read second printString, ' = '
+			,x printString) logCr ].
+		
+	add1 := (s newTask: 'add1')
+		in: #read;
+		out: #send;
+		state: #main -> #(#send #read 3)
+			do: [ :send :read | 
+			x := read first + read second + read third.
+			send at: 1 put: x.
+			('add1   ' , read first printString, ' + '
+			,read second printString, ' + '
+			,read third printString , ' = '
+			,x printString) logCr ].
+	
+	reader := (s newTask: 'reader')
+		in: #read;
+		state: #main -> #(#read 3)
 			do: [ :read | 
-			('Reader received ' , read first printString ) logCr ].
+			('Reader received ' , read first printString, ' '
+			,read second printString, ' '
+			,read third printString, ' ' ) logCr ].
 		
 		
 	matrice send >> join input first size: 9.
 	vecteur send >> join input second size:3.
 	
 	join output >> mult read size: 2.
-	mult send >> reader read.
+	
+	mult send >>  add1 read size: 3.
+	
+	add1 send >>  reader read size: 3.
+	
 	s fullyConnected.
 	s exploreInRoassal.
-	^ s
+	^ s 
