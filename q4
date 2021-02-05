@@ -19,6 +19,7 @@ q4
 			send at: 7 put: 7.
 			send at: 8 put: 8.
 			send at: 9 put: 9.
+			sender next: #exit. 
 			'S1 send 1 2 3 4 5 6 7 8 9' logCr ].
 		
 	reader := (s newTask: 'reader')

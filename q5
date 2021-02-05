@@ -19,6 +19,7 @@ q5
 			send at: 7 put: 3.
 			send at: 8 put: 6.
 			send at: 9 put: 9.
+			matrice next: #exit. 
 			"'Matrice send 1 4 7 2 5 8 3 6 9' logCr"].
 		
 	vecteur := (s newTask: 'vecteur')
